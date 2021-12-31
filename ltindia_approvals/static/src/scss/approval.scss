@@ -1,0 +1,51 @@
+.app_blk{
+        text-align: center;
+        padding: 10px 10px 10px 10px;
+        background-color: #ffffff;
+        width: 300px;
+        border-radius:6px;
+        font-size:20px;
+        border-style: solid;
+        border-color: #767676;
+       .app_state_info {
+           > thead, tbody {
+                & > tr > td {
+                color:red;
+                width:100px;
+            }
+        }
+    }
+    }
+   .filter_btn{
+            border-radius: 0px;
+            width: 65px;
+            max-width: 65px;
+            font-size:12px;
+            padding: 5px 1px 5px 1px;
+            > a:hover{
+                text-decoration: none;
+            }
+            background-color: #f8f9fa;
+            &:hover {
+                background-color: lighten(#41e75d, 18%);
+                font-color: black;
+            }
+
+            }
+.tb{
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.o_approval_dashboard {
+    max-width:100%;
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .o_dashboard_action {
+        cursor: pointer;
+    }
+}

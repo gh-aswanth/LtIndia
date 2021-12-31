@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_approval_roll_seq" model="ir.sequence">
+        <field name="name">ROLL SEQ</field>
+        <field name="code">approve.approve</field>
+        <field name="prefix">4M-ROLLNo/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="ltindia_approval_action" model="ir.actions.act_window">
+        <field name="name">Requests</field>
+        <field name="res_model">approval.approval</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'delete': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a Request.
+            </p>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_search_view" model="ir.ui.view">
+        <field name="name">ltindia.approval.search.view</field>
+        <field name="model">approval.approval</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Order">
+                <field name="name" string="Order"
+                       filter_domain="['|', '|', '|', '|','|','|', ('name', 'ilike', self), ('roll_no', 'ilike', self), ('rev_no', 'child_of', self), ('reference', 'child_of', self), ('request_user_id', 'child_of', self), ('document_id', 'child_of', self), ('department_id', 'child_of', self)]"/>
+                <field name="request_user_id"/>
+                <field name="document_id"/>
+                <field name="location_id"/>
+                <field name="department_id"/>
+                <filter name="my_responsible" string="My Responsible" domain="[('request_user_id', '=', uid)]"/>
+                <!--                    <filter string="Assigned for Me" name="assigned_for_me" domain="[('priority', '=', '1')]"/>-->
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter string="Warnings" name="activities_exception"
+                        domain="[('activity_exception_decoration', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Location" name="location" domain="[]" context="{'group_by': 'location_id'}"/>
+                    <filter string="Requested By" name="requested_by" domain="[]"
+                            context="{'group_by': 'request_user_id'}"/>
+                    <filter string="Department" name="department" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="Category" name="category" domain="[]"
+                            context="{'group_by': 'approval_category_id'}"/>
+                    <filter string="Approval Level" name="approval_level" domain="[]"
+                            context="{'group_by': 'approval_category_type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_tree" model="ir.ui.view">
+        <field name="name">ltindia.approval.tree.view</field>
+        <field name="model">approval.approval</field>
+        <field name="arch" type="xml">
+            <tree string="Approval" create="1" edit="1" js_class="approval_list_dashboard"
+                  decoration-warning="state == 'approved'"
+                  decoration-info="state in ('in_progress', 'verified', 'qc_ok', 'stock_ok')"
+                  decoration-success="state == 'closed'"
+                  decoration-danger="state == 'rejected'">
+                <field name="roll_no"/>
+                <field name="name"/>
+                <field name="department_id" string="Requested Department"/>
+                <field name="approval_category_id" string="Category"/>
+                <field name="request_user_id"/>
+                <field name="fourm_prepared_and_submitted" string="Start Date"/>
+                <field name="end_date"/>
+                <field name="approval_category_type_id" string="Approval Level"/>
+                <field name="state" string="Status" decoration-info="state in ('in_progress', 'verified', 'qc_ok', 'stock_ok')"
+                       decoration-warning="state == 'approved'" decoration-success="state == 'closed'"
+                       decoration-danger="state == 'rejected'" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_user_readonly_tree" model="ir.ui.view">
+        <field name="name">ltindia.approvals.user.readonly.tree.view</field>
+        <field name="model">approval.approval</field>
+        <field name="inherit_id" ref="ltindia_approval_tree"/>
+        <field name="groups_id" eval="[(4, ref('ltindia_approvals.group_ltindia_approval_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">0</attribute>
+                <attribute name="edit">0</attribute>
+                <attribute name="delete">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_form" model="ir.ui.view">
+        <field name="name">ltindia.approval.form.view</field>
+        <field name="model">approval.approval</field>
+        <field name="arch" type="xml">
+            <form string="Company Profile" create="1" edit="1">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state','!=', 'draft')]}"
+                            groups="ltindia_approvals.group_ltindia_approval_manager"/>
+                    <button name="action_set_draft" string="Set to draft" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state','!=', 'cancelled')]}"
+                            groups="ltindia_approvals.group_ltindia_approval_admin"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            attrs="{'invisible': [('state','not in', ['draft', 'in_progress', 'rejected'])]}"
+                            groups="ltindia_approvals.group_ltindia_approval_admin"/>
+                    <button name="action_impl_change_close" string="Close" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state','!=', 'approved')]}"
+                            groups="ltindia_approvals.group_ltindia_quality_manager"/>
+                    <button name="action_impl_change_close_revert" string="Revert" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state','!=', 'closed')]}"
+                            groups="ltindia_approvals.group_ltindia_quality_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress"/>
+                </header>
+                <sheet>
+                    <field name="approval_category_type_id" widget="statusbar" options="{'clickable': '0'}"
+                           attrs="{'invisible': [('approval_category_id', '=', False)]}" class="oe_right" readonly="1"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" required="1"
+                                   attrs="{'readonly': [('state', 'in', ['approved', 'rejected', 'closed', 'cancelled'])]}"/>
+                        </h1>
+                        <div style="display: flex;justify-content: space-between;">
+                            <h2>
+                                <field name="approval_category_id" options='{"no_open": True}' placeholder="Category"
+                                       attrs="{'readonly': [('state', 'in', ['approved', 'rejected', 'closed', 'cancelled'])]}"/>
+                            </h2>
+                            <h2>
+                                <field name="roll_no"
+                                       attrs="{'invisible': [('roll_no', '=', False)], 'readonly': True}"/>
+                            </h2>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="General information">
+                            <group>
+                                <group>
+                                    <field name="document_id" options='{"no_open": True}' readonly="1" force_save="1"/>
+                                    <field name="date" readonly="1" force_save="1" string="Create Date"/>
+                                    <field name="rev_no" readonly="1" force_save="1"/>
+                                    <field name="reference"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                </group>
+                                <group>
+                                    <field name="fourm_prepared_and_submitted" readonly="1"/>
+                                    <field name="end_date" readonly="1"/>
+                                    <field name="department_id" string="Department" placeholder="Requested Department"
+                                           options='{"no_open": True}' required="1"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'rejected', 'closed', 'cancelled'])]}"/>
+                                    <field name="location_id" options='{"no_open": True}' required="1"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'rejected', 'closed', 'cancelled'])]}"/>
+                                </group>
+
+                                <group>
+                                    <label for="starting_serial" string="Serial Range"/>
+                                    <div class="o_row">
+                                        <field name="starting_serial"
+                                               attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'cancelled', 'rejected'])]}"/>
+                                        <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                                        <field name="ending_serial"
+                                               attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                    </div>
+
+                                </group>
+
+
+                            </group>
+                            <separator/>
+                            <group>
+                                <group>
+                                    <field name="finished_product_ids" context="{'lt_product_code': True}"
+                                           style="width:90%" required="1"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'rejected', 'closed', 'cancelled'])]}"
+                                           nolabel="1">
+                                        <tree>
+                                            <field name="default_code" string="Product Code"/>
+                                            <field name="name" string="Product Description"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group>
+                                    <field name="deviation_line_ids" nolabel="1" required="1" style="width:100%"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}">
+                                        <tree editable="bottom">
+                                            <field name="mrp_no" string="MRP No / JO No"/>
+                                            <field name="deviation_qty"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                            <field name="request_line_ids" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                                <tree editable="bottom">
+                                    <field name="product_id" options='{"no_open": True}'/>
+                                    <field name="item_description" readonly="1" force_save="1"/>
+                                    <field name="request_product_id" options='{"no_open": True}'/>
+                                    <field name="req_item_description" readonly="1" force_save="1"/>
+                                    <field name="reason"/>
+                                </tree>
+                            </field>
+                            <separator/>
+                            <group>
+                                <field name="is_need_driver_notes" invisible="1"/>
+                                <group attrs="{'invisible': [('is_need_driver_notes', '=', False)]}">
+                                    <field name="major_control_points"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                    <field name="verification_results"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                    <field name="remarks"
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                </group>
+                                <group>
+                                    <field name="request_user_id" options='{"no_open": True}'
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                    <field name="change_verified_by" widget="many2many_tags" options='{"no_open": True}'
+                                           attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_line_ids"
+                                   attrs="{'readonly': [('state', 'in', ['approved', 'closed', 'rejected', 'cancelled'])]}">
+                                <tree decoration-success="approved == True" decoration-danger="rejected == True"
+                                      create="0" delete="0" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="department_id" readonly="1"/>
+                                    <field name="approval_category_type_id" invisible="1"/>
+                                    <field name="user_ids" widget="many2many_tags" readonly="1"/>
+                                    <field name="approved" readonly="1"/>
+                                    <field name="rejected" readonly="1"/>
+                                    <field name="date" readonly="1"/>
+                                    <field name="comment"/>
+                                    <field name="approval_id" invisible="1"/>
+                                    <button name="action_approve"
+                                            groups="ltindia_approvals.group_ltindia_approval_manager"
+                                            string="Approve" type="object" icon="fa-check text-success"/>
+                                    <button name="action_reject"
+                                            groups="ltindia_approvals.group_ltindia_approval_manager"
+                                            string="Reject" type="object" icon="fa-times-circle text-danger"
+                                            confirm="Are you sure, do you want to Reject?"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="note" placeholder="Additional Notes.."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_user_readonly_form" model="ir.ui.view">
+        <field name="name">ltindia.approvals.user.readonly.form.view</field>
+        <field name="model">approval.approval</field>
+        <field name="inherit_id" ref="ltindia_approval_form"/>
+        <field name="groups_id" eval="[(4, ref('ltindia_approvals.group_ltindia_approval_user'))]"/>
+        <field name="arch" type="xml">
+            <field name="note" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">0</attribute>
+                <attribute name="edit">0</attribute>
+                <attribute name="delete">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='finished_product_ids']/tree" position="attributes">
+               <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//page[1]/group[2]/group[2]/field[@name='deviation_line_ids']/tree" position="attributes">
+               <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_category_action" model="ir.actions.act_window">
+        <field name="name">Category</field>
+        <field name="res_model">approval.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define an Approval Category
+            </p>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_category_tree" model="ir.ui.view">
+        <field name="name">ltindia.approval.category.tree.view</field>
+        <field name="model">approval.category</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Category" create="1" edit="1">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_category_form" model="ir.ui.view">
+        <field name="name">ltindia.approval.category.form.view</field>
+        <field name="model">approval.category</field>
+        <field name="arch" type="xml">
+            <form string="Company Category" create="1" edit="1">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" required="1"/>
+                        </h1>
+                        <label for="is_need_driver_notes" class="oe_edit_only"/>
+                        <field name="is_need_driver_notes" widget="boolean_toggle"/>
+                    </div>
+
+                    <field name="approval_category_stage_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="department_id"/>
+                            <field name="approval_category_id"/>
+                            <field name="user_ids" widget="many2many_tags"/>
+                            <field name="state"/>
+                            <field name="sequence_dum"/>
+                        </tree>
+                    </field>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="ltindia_approval_document_action" model="ir.actions.act_window">
+        <field name="name">Document</field>
+        <field name="res_model">approval.document</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define an Approval Document
+            </p>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_document_tree" model="ir.ui.view">
+        <field name="name">ltindia.document.tree.view</field>
+        <field name="model">approval.document</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Category" create="1" edit="1" editable="bottom">
+                <field name="doc_no"/>
+                <field name="rev_no"/>
+                <field name="date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_location_action" model="ir.actions.act_window">
+        <field name="name">Location</field>
+        <field name="res_model">approval.location</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define an Approval Location
+            </p>
+        </field>
+    </record>
+
+    <record id="ltindia_approval_location_tree" model="ir.ui.view">
+        <field name="name">ltindia.location.tree.view</field>
+        <field name="model">approval.location</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Location" create="1" edit="1" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <menuitem action="ltindia_approval_action"
+              id="ltindia_approval_parent_one_child_one"
+              parent="ltindia_approval_parent_menu_one"
+              sequence="0"/>
+
+
+    <menuitem action="ltindia_approval_document_action"
+              id="ltindia_approval_parent_three_child_one"
+              parent="ltindia_approval_parent_menu_two"
+              sequence="0"/>
+
+    <menuitem action="ltindia_approval_location_action"
+              id="ltindia_approval_parent_three_child_two"
+              parent="ltindia_approval_parent_menu_two"
+              sequence="1"/>
+
+    <menuitem action="ltindia_approval_category_action"
+              id="ltindia_approval_parent_two_child_one"
+              parent="ltindia_approval_parent_menu_two"
+              sequence="0"/>
+
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="ltindia_approval_root"
+            name="4M Approval"
+            sequence="0"
+            groups="group_ltindia_approval_user,group_ltindia_approval_manager"
+            web_icon="ltindia_approvals,static/description/icon.png"/>
+
+        <menuitem id="ltindia_approval_parent_menu_one"
+            name="4M Requests"
+            sequence="1"
+            parent="ltindia_approval_root"/>
+
+
+        <menuitem id="ltindia_approval_parent_menu_two"
+            name="Configuration"
+            sequence="2"
+            groups="base.group_no_one"
+            parent="ltindia_approval_root"/>
+
+
+    </data>
+    </odoo>

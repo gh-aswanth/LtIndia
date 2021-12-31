@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="4m_approval_document_template">
+            <div t-attf-class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <div class="page">
+                    <div class="row">
+                        <div style="display:inline-grid;border:1px solid black;height:100px;width:250px;">
+                            <img src="/ltindia_approvals/static/img/logo.png" style="height:95px;width:230px;"/>
+                        </div>
+                        <div style="display:inline-block;border:1px solid black;height:100px;width:250px;border-left:none;">
+                            <div style="display:block;height:25px;width:250px;">
+                                Title
+                            </div>
+                            <div style="display:block;height:25px;width:250px;font-size:12px">
+                                <b><span t-esc="o.name"/></b>
+                            </div>
+                            <div style="display:block;height:25px;width:250px;border-top:1px solid black;">
+                                Department
+                            </div>
+                            <div style="display:block;height:25px;width:250px;">
+                                <b><span t-esc="o.department_id.name"/></b>
+                            </div>
+                        </div>
+                        <div style="display:inline-block;border:1px solid black;height:100px;width:250px;margin-left:-4px;">
+                             <div style="display:block;height:25px;width:250px;border-bottom:1px solid black;">
+                                Doc No: <b><span t-esc="o.document_id.doc_no"/></b>
+                            </div>
+                            <div style="display:block;height:25px;width:250px;border-bottom:1px solid black;">
+                                Date:<b><span t-esc="o.date.strftime('%d-%b-%Y')" /></b>
+                            </div>
+                            <div style="display:block;height:25px;width:250px;">
+                                Classification
+                            </div>
+                            <div style="display:block;height:25px;width:250px;">
+                                <center>Forum</center>
+                            </div>
+                        </div>
+                        <div style="display:inline-block;border:1px solid black;height:100px;width:252px;margin-left:-4px;">
+                            <div style="display:block;height:25px;width:250px;border-bottom:1px solid black;">
+                                Rev No: <b><span t-esc="o.rev_no"/></b>
+                            </div>
+                            <div style="display:block;height:25px;width:250px;border-bottom:1px solid black;">
+                                page 1 of 1
+                            </div>
+                            <div style="display:block;height:25px;width:250px;">
+                                Reference:
+                            </div>
+                            <div style="display:block;height:25px;width:250px;">
+                                <span t-esc="o.reference"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="display:line-block;height:100px;width:500px;border:1px solid black;">
+                            4M Rolling No:  <b><span t-esc="o.roll_no" style="padding-left:2px;"/></b><br/>
+                            4M Prepared &amp; Submitted Date: <b><span t-esc="o.fourm_prepared_and_submitted" style="padding-left:2px;"/></b>                        </div>
+                        <div style="display:line-block;height:100px;width:500px;border:1px solid black;">
+                            Section of 4M change:<br/>
+                            <strong>1-Man 2-Method 3-Material 4-Machine</strong>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="display:line-block;height:50px;width:500px;border:1px solid black;">
+                            Process Name: <span t-esc="o.reference" style="padding-left:2px;"/>
+                        </div>
+                        <div style="display:line-block;height:50px;width:500px;border:1px solid black;">
+                            Staring Date:
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="display:line-block;height:50px;width:250px;border:1px solid black;">
+                            Department: <span t-esc="o.department_id.name" style="padding-left:2px;"/>
+                        </div>
+                        <div style="display:line-block;height:50px;width:250px;border:1px solid black;">
+                            Location: <span t-esc="o.location_id.name" style="padding-left:2px;"/>
+                        </div>
+                         <div style="display:line-block;height:50px;width:500px;border:1px solid black;">
+                            Ending Date:
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="height:150px;width:500px;border:1px solid black;">
+                            <div style="display:block;height:50px;width:500px">
+                                Product Code: <span t-esc="', '.join(o.finished_product_ids.mapped('display_name'))"/>
+                            </div>
+                            <div style="display:inline-block;height:50px;width:250px">
+                                Starting Serial: <span t-esc="o.starting_serial"/>
+                            </div>
+                            <div style="display:inline-block;height:50px;width:250px">
+                                Ending Serial: <span t-esc="o.ending_serial"/>
+                            </div>
+                        </div>
+                        <div style="display:line-block;height:150px;width:500px;border:1px solid black;">
+                            <table>
+                                <thead>
+                                    <th>Mrp No / JO No</th>
+                                    <th>Deviation Qty</th>
+                                </thead>
+                                <tbody style="font-size:12px">
+                                    <tr t-foreach="o.deviation_line_ids" t-as="d_line">
+                                        <td style="width:250px"><span t-esc="d_line.mrp_no"/></td>
+                                        <td style="width:250px"><span t-esc="d_line.deviation_qty"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    <div class="row" style="border-left:1px solid black;border-right:1px solid black;">
+                         <table width="100%">
+                            <thead>
+                                <th>Item Code</th>
+                                <th>Item Description</th>
+                                <th>Deviated Item code</th>
+                                <th>Deviated item Description</th>
+                                <th>Reason</th>
+                            </thead>
+                            <tbody style="font-size:12px;">
+                                <tr t-foreach="o.request_line_ids" t-as="r_line">
+                                    <td style="width:200px"><span t-esc="r_line.product_id.default_code"/></td>
+                                    <td style="width:300px"><span t-esc="r_line.item_description"/></td>
+                                    <td style="width:200px"><span t-esc="r_line.request_product_id.default_code"/></td>
+                                    <td style="width:300px"><span t-esc="r_line.req_item_description"/></td>
+                                    <td style="width:400px"><span t-esc="r_line.reason"/></td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+
+                    <div class="row" t-if="o.is_need_driver_notes">
+                        <div style="height:40px;width:400px;border:1px solid black;">
+                            Major Control points
+                        </div>
+                        <div style="height:40px;width:300px;border:1px solid black;">
+                            Verification Results
+                        </div>
+                        <div style="height:40px;width:300px;border:1px solid black;">
+                            Remarks
+                        </div>
+                    </div>
+
+                    <div class="row" t-if="o.is_need_driver_notes">
+                        <div style="height:100px;width:400px;border:1px solid black;">
+                            <span t-esc="o.major_control_points"/>
+                        </div>
+                        <div style="height:100px;width:300px;border:1px solid black;">
+                            <span t-esc="o.verification_results"/>
+                        </div>
+                        <div style="height:100px;width:300px;border:1px solid black;">
+                            <span t-esc="o.remarks"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="display:line-block;height:40px;width:1000px;border:1px solid black;">
+                            Process Change Initiated By
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="display:line-block;height:40px;width:1000px;border:1px solid black;">
+                            <span t-esc="o.request_user_id.name"/>
+                        </div>
+                    </div>
+                    <div class="row" style="border-top:1px solid black;border-bottom:1px solid black;">
+                        <div style="display:line-block;height:40px;width:1000px;border:1px solid black;">
+                            Process Change Reviewed and Validated By
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:1px solid black;">
+                        <div style="display:line-block;height:40px;width:1000px;border:1px solid black;">
+                            <span t-esc="', '.join(o.change_verified_by.mapped('name'))"/>
+                        </div>
+                    </div>
+
+                    <div class="row" style="border-left:1px solid black;border-right:1px solid black;">
+                         <table width="100%">
+                            <thead>
+                                <th>Department</th>
+                                <th>Review &amp; Approval Signatures</th>
+                                <th>Date</th>
+                                <th>Approved</th>
+                                <th>Rejected</th>
+                                <th>Comments</th>
+                            </thead>
+                            <tbody style="font-size:12px;">
+                                <t t-set="t_lines" t-value="len(o.approval_line_ids)"/>
+                                <t t-set="count" t-value="0"/>
+                                <tr t-foreach="o.approval_line_ids.sorted(key=lambda l: l.sequence)" t-as="line">
+                                    <t t-set="count" t-value="count + 1"/>
+                                    <td style="width:200px;border:1px solid black;"><span t-esc="line.department_id.name"/></td>
+                                    <td style="width:400px;border:1px solid black;"><span t-esc="', '.join(line.user_ids.mapped('name'))"/></td>
+                                    <td style="width:100px;border:1px solid black;"><span t-if="line.date" t-esc="line.date.strftime('%d-%m-%Y')"/></td>
+                                    <td style="width:100px;border:1px solid black;"><t t-if="line.approved"><img src="/ltindia_approvals/static/img/approved.png" style="height:30px;width:30px;margin-left:30px;"/></t></td>
+                                    <td style="width:100px;border:1px solid black;"><t t-if="line.rejected"><img src="/ltindia_approvals/static/img/reject.png" style="height:30px;width:30px;margin-left:30px;"/></t></td>
+                                    <td t-attf-style="width:400px;border-bottom:{{ '1px solid black;' if count == t_lines else 'none;'}}border-top:{{ '1px solid black;' if count == 1 else 'none;'}}"><span t-esc="line.comment"/></td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="report_4m_approval_document_template">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.html_container">
+                    <t t-call="ltindia_approvals.4m_approval_document_template"/>
+                </t>
+            </t>
+        </template>
+
+        <record id="ltindia_approval_document_paper_format" model="report.paperformat">
+            <field name="name">4M Approval</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">2</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">2</field>
+            <field name="margin_right">2</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="report_4m_approval_document" model="ir.actions.report">
+            <field name="name">4M Approval (Document)</field>
+            <field name="model">approval.approval</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">ltindia_approvals.report_4m_approval_document_template</field>
+            <field name="report_file">ltindia_approvals.report_4m_approval_document_template</field>
+            <field name="print_report_name">(object._get_report_base_filename())</field>
+            <field name="attachment">'test_template.pdf'</field>
+            <field name="binding_model_id" ref="model_approval_approval"/>
+            <field name="paperformat_id" ref="ltindia_approval_document_paper_format"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

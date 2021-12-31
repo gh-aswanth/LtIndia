@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!-- This template is for a table at the top of purchase views that shows some KPIs. -->
+    <t t-name="ltindia_approvals.ApprovalDashboard1">
+        <div class="o_approval_dashboard container">
+
+                <div class="tb">
+                     <t t-if='lines' t-foreach="lines['top_board']" t-as="line">
+                         <div class="app_blk">
+                             <div class="row">
+                                 <div class="col-4">
+                                     <a href="#" class="o_dashboard_action col-auto" t-att-id="line['ctg'][0]" t-att-title="line['ctg'][1]">
+                                         <span t-esc="line['ctg'][1]" style="display:block;font-family:'Oswald', sans-serif;"/>
+                                         <span t-esc="line['count']" style="display:block;font-family:'Oswald', sans-serif;"/>
+                                     </a>
+                                 </div>
+                                 <div class="col-8">
+                                     <table class="app_state_info col-auto">
+                                         <tr>
+                                             <td style="font-family:'Oswald', sans-serif;font-size:12px;text-align:left;">
+                                                 <div style="color:blue">All</div>
+                                            </td>
+                                             <td></td>
+                                             <td class="o_all" style="font-family:'Oswald', sans-serif;font-size:12px;text-align:center;width:100px">
+                                                 <a href="#">View</a>
+                                             </td>
+                                         </tr>
+                                          <tr t-foreach="line['bottom_board']" t-as="li">
+                                            <td t-esc="li['state'][1]" style="font-family:'Oswald', sans-serif;font-size:12px;text-align:left;"/>
+                                            <td t-esc="li['state_count']" style="font-family:'Oswald', sans-serif;font-size:12px;text-align:center;width:100px"/>
+                                            <td style="font-family:'Oswald', sans-serif;font-size:12px;text-align:center;width:100px" class="app_state">
+                                                <a href="#" style="font-family:'Oswald', sans-serif;" t-att-ctg-id="line['ctg'][0]" t-att-ap-state="li['state'][0]" t-att-title="line['ctg'][1]">View</a>
+                                            </td>
+                                          </tr>
+                                     </table>
+                                 </div>
+                             </div>
+                             <div class="row">
+                                  <t t-foreach="line['stage']" t-as="s">
+                                     <div class="filter_btn col-auto">
+                                         <a href="#" style="font-family:'Oswald', sans-serif;" t-att-ctg-id="line['ctg'][0]" t-att-id="s[0]" t-att-title="s[1]"><span t-esc="s[1]"/></a>
+                                     </div>
+                                  </t>
+                             </div>
+                         </div>
+
+                     </t>
+<!--                    <table class="table table-sm">-->
+<!--                            <tr>-->
+<!--                                <td class="o_text o_all">-->
+<!--                                    <a href="#">-->
+<!--                                        <div>All Documents</div>-->
+<!--                                    </a>-->
+<!--                                </td>-->
+<!--                                <t t-foreach="lines['bottom_board']" t-as="line">-->
+<!--                                    <td class="o_text" t-esc="line['state']" style="font-family:'Oswald', sans-serif;"/>-->
+<!--                                    <td t-esc="line['state_count']" style="font-family:'Oswald', sans-serif;"/>-->
+<!--                                </t>-->
+<!--                            </tr>-->
+<!--                    </table>-->
+                </div>
+            </div>
+
+    </t>
+    <t t-name="ltindia_approvals.ApprovalDashboard2">
+        <div class="o_approval_dashboard container">
+            <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-sm">
+                        <tr>
+                            <t t-foreach="lines['bottom_board']" t-as="line">
+                                <td class="o_text" t-esc="line['state']" style="font-family:'Oswald', sans-serif;"/>
+                                <td t-esc="line['state_count']" style="font-family:'Oswald', sans-serif;"/>
+                            </t>
+                        </tr>
+                </table>
+            </div>
+        </div></div>
+    </t>
+</templates>
